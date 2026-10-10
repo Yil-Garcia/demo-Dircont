@@ -420,6 +420,7 @@
         return;
       }
 
+      window.contactosActuales = contactos;
       tablaBody.innerHTML = contactos.map(c => `
         <tr>
           <td class="col-id">#${c.id}</td>
@@ -428,7 +429,7 @@
           <td>${escaparHTML(c.telefono)}</td>
           <td class="col-actions">
             <div class="actions-group">
-              <button class="btn btn-secondary btn-sm" onclick="iniciarEdicion(${c.id}, '${escaparParam(c.nombre)}', '${escaparParam(c.email)}', '${escaparParam(c.telefono)}')">Editar</button>
+              <button class="btn btn-secondary btn-sm" onclick="iniciarEdicion(${c.id})">Editar</button>
               <button class="btn btn-danger btn-sm" onclick="eliminarContacto(${c.id})">Eliminar</button>
             </div>
           </td>
@@ -483,12 +484,15 @@
     /**
      * Preparar el formulario para modo edición
      */
-    function iniciarEdicion(id, nombre, email, telefono) {
+    function iniciarEdicion(id) {
+      const contacto = (window.contactosActuales || []).find(c => c.id === id);
+      if (!contacto) return;
+
       editandoId = id;
       inputId.value = id;
-      inputNombre.value = nombre;
-      inputEmail.value = email;
-      inputTelefono.value = telefono;
+      inputNombre.value = contacto.nombre;
+      inputEmail.value = contacto.email;
+      inputTelefono.value = contacto.telefono;
 
       formTitle.textContent = `✏️ Editando Contacto #${id}`;
       btnGuardar.textContent = 'Actualizar Contacto';
@@ -546,6 +550,10 @@
       const div = document.createElement('div');
       div.textContent = texto || '';
       return div.innerHTML;
+    }
+
+    function escaparParam(texto) {
+      return (texto || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
     /**
